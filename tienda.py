@@ -1,6 +1,8 @@
 from producto import Producto
+from abc import ABC, abstractmethod
 
-class Tienda:
+
+class Tienda(ABC):
     def __init__(self, nombre:str, delivery:float):
         self._nombre = nombre
         self._delivery = delivery
@@ -21,23 +23,38 @@ class Tienda:
                 return
         self._productos.append(producto)
 
+    @abstractmethod
     def listar_producto(self):
-        raise NotImplementedError
+        pass
     
-    def realizar_venta(self):
-        raise NotImplementedError
-    
-    class Restaurante(Tienda):
-        def ingresar_producto(self, producto: Producto):
-            producto.stock = 0
-            super().ingresar_producto(producto)
+    @abstractmethod
+    def realizar_venta(self, nombre_producto: str, cantidad:str):
+        pass
 
-        def listar_producto(self):
-            result = f"Productos de Restaurante {self.nombre}:\n"
-            for p in self._productos:
-                result += f" - {p.nombre} | ${p.precio}\n"
-            
-            return result
+
+# Clase Restaurante
+class Restaurante(Tienda):
+    def ingresar_producto(self, producto: Producto):
+        producto.stock = 0
+        super().ingresar_producto(producto)
+
+    def listar_producto(self):
+        resultado = f"Productos de Restaurante {self.nombre}:\n"
+        for p in self._productos:
+            resultado += f" - {p.nombre} | ${p.precio}\n"
         
-        def realizar_venta(self,nombre_procuto: str, cantidad: int):
-            pass # No modifica stock
+        return resultado
+    
+    def realizar_venta(self,nombre_producto: str, cantidad: int):
+        pass # No modifica stock
+
+#Clase Supermercado
+class Supermercado(Tienda):
+    def listar_producto(self):
+        resultado = f"Productos de Supermercado {self.nombre}:\n"
+        for p in self._productos:
+            info_stock = f"{p.stock}"
+            if p.stock < 10:
+                info_stock += "Pocos productos disponibles"
+            resultado += f"- {p.nombre} | ${p.precio} | Stock: {info_stock}\n"
+        return resultado
