@@ -58,3 +58,35 @@ class Supermercado(Tienda):
                 info_stock += "Pocos productos disponibles"
             resultado += f"- {p.nombre} | ${p.precio} | Stock: {info_stock}\n"
         return resultado
+    
+    def realizar_venta(self, nombre_producto: str, cantidad: int):
+        for p in self._productos:
+            if p.nombre == nombre_producto:
+                if p.stock == 0:
+                    return
+                vendido = min(p.stock, cantidad)
+                p - vendido
+                return
+            
+# Clase Farmacia
+class Farmacia(Tienda):
+    def listar_producto(self):
+        resultado = f"Productos de Farmacia {self.nombre}\n"
+        for p in self._productos:
+            extra = ""
+            if p.precio > 15000:
+                extra = "Envío gratis por la compra de este producto"
+            resultado += f"- {p.nombre} | ${p.precio}{extra}\n"
+
+        return resultado
+    
+    def realizar_venta(self, nombre_producto: str, cantidad:int):
+        if cantidad > 3:
+            return
+        for p in self._productos:
+            if p.nombre == nombre_producto:
+                if p.stock == 0:
+                    return
+                vendido = min(p.stock, cantidad)
+                p - vendido
+                return
