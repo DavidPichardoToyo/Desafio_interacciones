@@ -1,104 +1,75 @@
-from tienda import Tienda, Supermercado, Farmacia, Restaurante
 import os
-#3. En un archivo programa.py, implementa la lógica necesaria para crear una tienda e ingresar sus productos. 
-# 
-# Se debe solicitar ingresar productos hasta que el usuario indique lo contrario. 
+from tienda import Restaurante, Supermercado, Farmacia
+from producto import Producto
 
+def limpiar_pantalla():
+    os.system('cls' if os.name == 'nt' else 'clear')
 
-
-#Elegir el tipo de tienda
-##Se evalua que el dato ingresado sea correcto para continuar
-print("=========== Bienvenido al programa especializado en Tiendas =======")
-
-frase = """
-Elija el tipo de tienda a trabajar:
-    1.- Farmacia
-    2.- Restaurant
-    3.- Supermercado
-elección: """
-
-eleccion = Tienda.validador_numero_1al3(frase)
-
-if eleccion == 1:
-    valido = True
-    tipo_tienda = "Farmacia"
-
-elif eleccion == 2:
-    valido = True
-    tipo_tienda = "Restaurante"
-
-elif eleccion == 3:
-    valido = True
-    tipo_tienda = "Supermercado"
-
-
-#se piden los atributos de la clase
-nombre = input(f"Ingrese el nombre de su {tipo_tienda}: ")
-
-frase = f"Ingrese el costo de delivery de su {tipo_tienda}: "
-delivery = Tienda.validador_numero_positivo(frase)
-
-if tipo_tienda == "Farmacia":
-    tienda = Farmacia(nombre, delivery)
-elif tipo_tienda == "Restaurante":
-    tienda = Restaurante(nombre, delivery)
-elif tipo_tienda == "Supermercado": 
-    tienda = Supermercado(nombre, delivery)
-
-
-
-
-print(f"Su tienda de tipo {tipo_tienda} fue creada con exito")
-#ingresar productos
-ingresar_productos = True
-tienda.ingresar_producto()
-while ingresar_productos:
-    print("\nQuieres ingresar un nuevo producto? s/n")
-    pregunta = input()
-    if pregunta.lower() == "s" or pregunta.lower() == "si":
-        tienda.ingresar_producto()
-    elif pregunta.lower() == "n" or pregunta.lower() == "no":
-        ingresar_productos = False
+def crear_tienda():
+    limpiar_pantalla()
+    print("=CREAR TIENDA=")
+    tipo = input("Tipo de tienda (restaurante/supermercado/farmacia): ").lower()
+    nombre = input("Nombre de la tienda : ")
+    costo = float(input("Costo de delivery : "))
+    if tipo == "restaurante":
+        return Restaurante(nombre, costo)
+    
+    elif tipo == "supermercado":
+        return Supermercado(nombre, costo)
+    
+    elif tipo == "farmacia":
+        return Farmacia(nombre, costo)
+    
     else:
-        print("\nValor ingresado no válido\n")
-
-os.system('cls')
-#ciclo para elegir listar productos, realizar venta o salir del programa
-
-print(f"\n========== Bienvenido a nuestra tienda de {tipo_tienda} ==========\n")
-while True:
+        print("Tipo de tienda no válido. Intente nuevamente")
+        return crear_tienda
     
-    frase = """Ingrese su elección:
-            1.- Listar los productos.
-            2.- Realizar una venta.
-            3.- Salir del programa.
-        elección: """
-    eleccion = Tienda.validador_numero_1al3(frase)
-
-    if eleccion == 1:
-        print(tienda.listar_productos())
-
-    elif eleccion == 2:
-        
-        
-        nombre_producto = input("Ingrese el nombre del producto a comprar: ") #realizar un buscar
-        if tienda.buscador(nombre_producto) is None:
-            print("\n\nEl Producto ingresado no se encuentra en nuestra base de datos\n\n")
-            input("Aprete enter para continuar")
-            os.system('cls')
+def ingresar_productos(tienda):
+    while True:
+        limpiar_pantalla()
+        print(f"= INGRESAR PRODUCTOS a {tienda.nombre} =")
+        nombre = input("Nombre del producto : ")
+        precio = float(input("Precio del producto : "))
+        stock_input = input("Stock (enter para 0) : ")
+        stock = int(stock_input) if stock_input else 0
+        p = Producto(nombre, precio, stock)
+        tienda.ingresar_producto(p)
+        if input("¿Ingresar otro producto? (s/n): ").lower() != "s":
             break
-        cantidad_producto = Tienda.validador_numero_positivo("Ingrese la cantidad a comprar: ")
 
-        existe, cantidad, monto = tienda.venta(nombre_producto, cantidad_producto)
+def menu(tienda):
+    while True:
+        limpiar_pantalla()
+        print(f"= MENÚ {tienda.nombre} =")
+        print("1. Listar productos")
+        print("2. Realizar venta")
+        print("3. Salir")
+        opcion = input("Selecciona opción : ")
 
-        if existe:
-            print(f"El monto a pagar es ${monto} pesos por {cantidad} {nombre_producto} más delivery")
-        else: 
-            print(f"{monto} {cantidad}")
+        if opcion == "1":
+            limpiar_pantalla()
+            print(tienda.listar_producto())
+            input("\nPresiona Enter para continuar...")
 
-    elif eleccion == 3:
-        print("Un buen momento para descansar, adiós")
-        exit()
-    
-    input("Aprete enter para continuar")
-    os.system('cls')
+        elif opcion == "2":
+            nombre = input("Nombre del producto : ")
+            cantidad = int(input("Cantidad : "))
+            tienda.realizar_venta(nombre, cantidad)
+            print("Venta procesada (si fue válida).")
+            input("\nPresiona Enter para continuar...")
+
+        elif opcion == "3":
+            print("Saliendo del programa.")
+            break
+
+        else:
+            print("Opción no válida.")
+            input("\nPresiona Enter para continuar...")
+
+def main():
+    tienda = crear_tienda()
+    ingresar_productos(tienda)
+    menu(tienda)
+
+if __name__ == "__main__":
+    main()
